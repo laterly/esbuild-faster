@@ -12,6 +12,9 @@ import http from 'node:http'
 // Start esbuild's server on a random local port
 let ctx = await esbuild.context({
   // ... your build options go here ...
+  entryPoints: ['src/index.tsx'],
+  bundle: true,
+  outfile: 'dist/index.js',
 })
 
 // The return value tells us where esbuild's local server is

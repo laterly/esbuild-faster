@@ -4,7 +4,7 @@ const App: React.FC = () => {
   return (
     <div>
       <p>数字:{state}</p>
-      <button onClick={() => setState((prev) => prev + 1)}></button>
+      <button onClick={() => setState((prev) => prev + 1)}>点击呀</button>
     </div>
   );
 };
