@@ -61,7 +61,7 @@ http
 
       // Otherwise, forward the response from esbuild to the client
       res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      // proxyRes.pipe(res, { end: true });
+      proxyRes.pipe(res, { end: true });
     });
 
     // Forward the body of the request to esbuild
