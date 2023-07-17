@@ -9,6 +9,7 @@
 import * as esbuild from "esbuild";
 import http from "node:http";
 import { sassPlugin } from "esbuild-sass-plugin";
+import { lessLoader } from "esbuild-plugin-less";
 import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 
@@ -20,6 +21,8 @@ let ctx = await esbuild.context({
     entryPoints: ["src/index.tsx"],
     bundle: true,
     outfile: "dist/index.js",
+    loader: { '.data': 'base64','.png': 'dataurl' },
+
     plugins: [
       sassPlugin({
         async transform(source) {
@@ -27,8 +30,11 @@ let ctx = await esbuild.context({
           return css;
         },
       }),
+      lessLoader(),
     ],
   })
+// 使用上下文，开启监听
+await ctx.watch();
 
 // The return value tells us where esbuild's local server is
 let { host, port } = await ctx.serve({ servedir: "." });
@@ -45,20 +51,20 @@ http
     };
 
     // Forward each incoming request to esbuild
-    const proxyReq = http.request(options, (proxyRes) => {
-      // If esbuild returns "not found", send a custom 404 page
-      if (proxyRes.statusCode === 404) {
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.end("<h1>A custom 404 page</h1>");
-        return;
-      }
+    // const proxyReq = http.request(options, (proxyRes) => {
+    //   // If esbuild returns "not found", send a custom 404 page
+    //   if (proxyRes.statusCode === 404) {
+    //     res.writeHead(404, { "Content-Type": "text/html" });
+    //     res.end("<h1>A custom 404 page</h1>");
+    //     return;
+    //   }
 
-      // Otherwise, forward the response from esbuild to the client
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      proxyRes.pipe(res, { end: true });
-    });
+    //   // Otherwise, forward the response from esbuild to the client
+    //   res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    //   // proxyRes.pipe(res, { end: true });
+    // });
 
     // Forward the body of the request to esbuild
-    req.pipe(proxyReq, { end: true });
+    // req.pipe(proxyReq, { end: true });
   })
   .listen(3000);
